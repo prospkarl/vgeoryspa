@@ -409,7 +409,16 @@ class Purchaseorder extends MY_Controller {
 			$where['with_discrepancy'] = 1;
 		}
 
-		$select ="*,(SELECT concat(fname, ' ', lname) from tbl_user_details where user_id = tbl_purchase_order.received_by) as name, FORMAT(total_cost,'c','en-PH') AS 'total_cost'";
+		$select ="
+			poid,
+			supplier,
+			total_qty,
+			total_cost,
+			IFNULL(received_date, created_date) as last_updated,
+			status,
+			(SELECT concat(fname, ' ', lname) from tbl_user_details where user_id = tbl_purchase_order.received_by) as name, FORMAT(total_cost,'c','en-PH') AS 'total_cost'
+		";
+
 		$group = array();
 		$list = $this->MY_Model->get_datatables('tbl_purchase_order',$column_order, $select, $where, $join, $limit, $offset ,$search, $order, $group);
 		$output = array(

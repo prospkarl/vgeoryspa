@@ -167,6 +167,9 @@ $(document).ready(function() {
                     type:'post',
                     dataType:'json',
                     data: self.serialize() + "&poid=" + self.data('id'),
+                    beforeSend: function(){
+                        $(this).find('button[type="submit"]').html('Please wait...').prop('disabled', true);
+                    },
                     success: function(data) {
                         purchaseOrder(url, "all");
                         if (data.data['data'] != 'error') {
@@ -175,6 +178,9 @@ $(document).ready(function() {
                         }else {
                             showNotification(data);
                         }
+                    },
+                    complete:function(){
+                        $(this).find('button[type="submit"]').prop('disabled', false);
                     }
                 });
             }else {
@@ -415,7 +421,7 @@ function purchaseOrder(url, status) {
              {"data":"supplier"},
              {"data":"total_qty"},
              {"data":"total_cost"},
-             {"data":"created_date"},
+             {"data":"last_updated"},
              {"data":"status","render": function(data, type, row) {
                  return getStatus(row.status);
              }},
