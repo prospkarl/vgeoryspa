@@ -389,4 +389,5 @@ class MY_Controller extends MX_Controller {
 		$result = $this->MY_Model->getRows('tbl_options', $options, 'row_array');
 		return $result['option_value'];
 	}
+
 }
