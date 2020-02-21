@@ -1,0 +1,36 @@
+@media (max-width: 1300px) {
+    .button-container {
+        max-width: 30%;
+    }
+}
+
+@media (max-width: 780px) {
+    .button-container {
+        max-width: 46%;
+    }
+}
+
+@media (max-width: 830px) {
+    .modal-mask{
+        align-items: flex-start;
+    }
+    .location-container{
+        margin-top:6em;
+    }
+    .modal-dialog{
+        max-width: 95%;
+    }
+    .tooltip {
+        display: none !important
+    }
+    .autocomplete_drp-content {
+        position: static;
+    }
+}
+
+@media (max-width: 649px) {
+    .button-container {
+        max-width: 100%;
+    }
+
+}

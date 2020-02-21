@@ -1,0 +1,14 @@
+September 10, 2019
+Author: Eduardo T. Morales
+- Added new helper named "global_helper" ("project_folder\application\helpers\") (this helper is executed through autoload in codeigniter config folder under application folder "project_folder\application\config")
+- Added json function for displaying json result
+- Added new options instead of only using $this->MY_Model->getRows() you can now use getrow() function with the same parameters to be passed, same as insert, delete, update, datatables
+- Auto detect base url
+
+September 17, 2019
+Author: Eduardo T. Morales
+- Fixed Auto detect base url
+
+September 20, 2019
+Author: Eduardo T. Morales
+- Modified global_helper.php file under application/helpers

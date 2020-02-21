@@ -1,0 +1,113 @@
+@media (max-width: 1300px) {
+  .button-container {
+    max-width: 18.56%;
+    margin: 0 7px;
+  }
+}
+
+@media (max-width: 780px) {
+  .button-container {
+    max-width: 46%;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .modal-mask {
+    align-items: flex-start;
+  }
+  .location-container {
+    margin-top: 6em;
+  }
+  .modal-dialog {
+    max-width: 95%;
+  }
+  .tooltip {
+    display: none !important;
+  }
+  .autocomplete_drp-content {
+    position: static;
+  }
+
+  .topbar .top-navbar {
+    min-height: unset !important;
+  }
+
+  .page-wrapper.sales,
+  .remove-padding-sm {
+    padding: 0;
+  }
+
+  .sales-muted {
+    font-size: 10px;
+    margin-bottom: 0;
+  }
+  .remove-margin-sm {
+    margin: 0 !important;
+  }
+
+  .topbar .top-navbar .navbar-header .navbar-brand .light-logo {
+    height: 37px;
+  }
+  .welcome-message {
+    font-size: 25px;
+    line-height: 1;
+    margin-bottom: 9px;
+  }
+  .card-body {
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 5px 5px 1em #eee;
+  }
+  .hide-sm {
+    display: none;
+  }
+  .padding-sm {
+    padding: 0 8px;
+  }
+  .vh-font {
+    font-size: 25px;
+    line-height: 1;
+  }
+  .progress-bar{
+    height: 4px !important;
+  }
+  .sales-btn-icon{
+    font-size:40px;
+    height: 25px;
+  }
+  .inner-btn{
+    min-height: 154px;
+  }
+  .inner-btn p{
+    font-size:10px
+  }
+  .btn-title{
+   font-size: 15px;
+   font-weight: 900;
+   line-height: 1;
+  }
+  .sales-btn:hover i{
+    font-size: 45px !important;
+  }
+  .page-wrapper.sales{
+      min-height: 430px !important;
+  }
+
+  .responsive-table{
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  .button-container {
+    max-width: 18%;
+    margin: 0 7px;
+  }
+}
+
+@media (max-width: 649px) {
+  .button-container {
+    max-width: 100%;
+  }
+}
