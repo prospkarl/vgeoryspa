@@ -246,20 +246,26 @@ class Daily_inventory extends MY_Controller
         $has_previous_inv_op['order'] = 'date';
         $has_previous_inv_op['order_op'] = 'desc';
         $has_previous_inv = $this->MY_Model->getRows('tbl_daily_inventory', $has_previous_inv_op, 'row_array');
-        
+
         if (!empty($has_previous_inv)) {
             $date_from = $has_previous_inv['date'];
         }
 
         $date_to = date('Y-m-d H:i:s');
         $location = $this->session->location;
-        $params['select'] = "*,(SELECT beg_balance FROM tbl_beginning_bal WHERE product_id = tbl_stocks.product_id AND  location ='$location') as beg_bal,(SELECT price FROM tbl_products WHERE product_id = tbl_stocks.product_id) as price,(SELECT name FROM tbl_products WHERE product_id = tbl_stocks.product_id) as name, (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = '$location' AND  item_id = tbl_stocks.product_id AND type=0 AND date_added BETWEEN '$date_from' AND  '$date_to') as total_ins, (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = '$location' AND item_id = tbl_stocks.product_id AND type= 1 AND date_added BETWEEN '$date_from' AND  '$date_to') as total_out";
+        $params['select'] = "*,
+            (SELECT beg_balance FROM tbl_beginning_bal WHERE product_id = tbl_stocks.product_id AND  location ='$location') as beg_bal,
+            (SELECT price FROM tbl_products WHERE product_id = tbl_stocks.product_id) as price,
+            (SELECT name FROM tbl_products WHERE product_id = tbl_stocks.product_id) as name,
+            (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = '$location' AND item_id = tbl_stocks.product_id AND type = 0 AND date_added BETWEEN '$date_from' AND  '$date_to') as total_ins,
+            (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = '$location' AND item_id = tbl_stocks.product_id AND type= 1 AND date_added BETWEEN '$date_from' AND  '$date_to') as total_out
+        ";
 
         $params['where'] = array(
             'location' => $this->session->location,
         );
         $res = $this->MY_Model->getRows('tbl_stocks', $params);
-        
+
 
         $td = array();
 

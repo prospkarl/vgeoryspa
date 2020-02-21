@@ -2,6 +2,10 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Requests extends MY_Controller {
+	public function __construct() {
+		$this->load->library('../../common/controllers/Common');
+	}
+
 	public function index(){
 		$params['where'] = array("status" => 0);
 		$data['location'] = $this->MY_Model->getRows('tbl_locations',$params);
@@ -52,99 +56,27 @@ class Requests extends MY_Controller {
 	}
 
 	public function transferStock() {
-		$data_arr = array();
+		$transfer_id = $this->common->transferItems();
 
-		$inv_movement_out = array();
-		$inv_movement_in = array();
-
-		for ($i=0; $i < count($this->input->post('items')); $i++) {
-			$data_arr[] = array(
-				"item_id"=>$this->input->post('items')[$i],
-				"qty"=>$this->input->post('quantity')[$i],
-			);
-
-			$data_mov_out = array(
-				"item_id" => $this->input->post('items')[$i],
-				"item_qty" => $this->input->post('quantity')[$i],
-				"type" => 1,
-				"location" => $this->input->post('loc_from'),
-				"movement_type" => "Stock Transfer",
-				"date_added" => date('Y-m-d H:i:s')
-			);
-			$movement_out = $this->MY_Model->insert('tbl_inventory_movement', $data_mov_out);
-			$inv_movement_out[] = $movement_out;
-
-			$data_mov_in = array(
-				"item_id" => $this->input->post('items')[$i],
-				"item_qty" => $this->input->post('quantity')[$i],
-				"type" => 0,
-				"location" => $this->input->post('loc_to'),
-				"movement_type" => "Stock Transfer",
-				"date_added" => date('Y-m-d H:i:s')
-			);
-			$movement_in = $this->MY_Model->insert('tbl_inventory_movement', $data_mov_in);
-			$inv_movement_in[] = $movement_in;
-
-			// - LOCATION "FROM"
-			$tbl_stock_options['where'] = array(
-				'location' => 1,
-				'product_id' => $this->input->post('items')[$i]
-			);
-
-			$stock_info = $this->MY_Model->getRows('tbl_stocks', $tbl_stock_options, 'row_array');
-
-			if (!empty($stock_info)) {
-				$set_stocks = array(
-					'qty' => $stock_info['qty'] - $this->input->post('quantity')[$i]
-				);
-				$this->MY_Model->update('tbl_stocks', $set_stocks, $tbl_stock_options['where']);
-			}else {
-				$insert_data = array(
-					'product_id' => $this->input->post('items')[$i],
-					'location' => 1,
-					'qty' => $this->input->post('quantity')[$i]
-				);
-
-				$this->MY_Model->insert('tbl_stocks', $insert_data);
-			}
+		if (!$transfer_id) {
+			ajax_response('Something Went wrong', 'error');
 		}
-
-		$data = array(
-			"items" => json_encode($data_arr),
-			"location_to" => $this->input->post('loc_to'),
-			"location_from" => $this->input->post('loc_from'),
-			"transfer_by" => $this->session->userdata('id'),
-			"date_added" => date('Y-m-d')
-		);
-		$res = $this->MY_Model->insert('tbl_stocktransfer',$data);
-
-
-		//Update Inventory Movement
-		$set_inv_mov = array( 'reference_id' => $res );
-
-		foreach ($inv_movement_out as $inv_movement_out) {
-			$this->MY_Model->update('tbl_inventory_movement', $set_inv_mov, array('movement_id' => $inv_movement_out));
-		}
-
-		foreach ($inv_movement_in as $inv_movement_in) {
-			$this->MY_Model->update('tbl_inventory_movement', $set_inv_mov, array('movement_id' => $inv_movement_in));
-		}
-
 
 		$data = array(
 			"approved_by" => $this->session->userdata('id'),
 			"approved_date" => date('Y-m-d'),
 			"status" => 1,
 			'remarks' => ($this->input->post('remark') != '') ?$this->input->post('remark') : "-",
-			"transfer_id" => $res
+			"transfer_id" => $transfer_id
 		);
+
 		$where_arr = array(
 			'request_id' => $this->input->post('req_id'),
 		);
 
 		$result = $this->MY_Model->update('tbl_request', $data, $where_arr);
 
-	   ($res) ?	ajax_response('Added Successfully','success') :ajax_response('Add Successfully','success');
+	    ($transfer_id) ?ajax_response('Added Successfully','success') :ajax_response('Add Successfully','success');
 	}
 
 	public function viewRequest() {
