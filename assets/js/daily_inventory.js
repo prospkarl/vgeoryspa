@@ -16,6 +16,12 @@ $(document).ready(function(){
                   $('.coverage').html(data.coverage);
                   $('.date_from').val(data.date_from);
                   generateTableInput(data.table, "#recordDaily");
+              },
+              complete: function(){
+                    $('#recordDaily').DataTable({
+                        "order" : [[ 0, "asc" ]],
+                        "paging" : false,
+                    });
               }
           });
       }

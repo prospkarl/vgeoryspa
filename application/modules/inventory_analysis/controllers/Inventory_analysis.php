@@ -4,111 +4,89 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Inventory_analysis extends MY_Controller {
     public function index(){
-        $this->load_page("index");
+        $locations_op['where'] = array('status' =>0);
+        $data['locations'] = $this->MY_Model->getRows('tbl_locations', $locations_op);
+        $this->load_page("index", $data);
     }
 
-    public function checkAvg(){
-        $array_hold = array();
-        $params_check['select'] = "product_id,date_added,name";
-        $items = $this->MY_Model->getRows('tbl_products', $params_check);
-        // =================== diri kuwaon niya ang mga dates nga na sold
-        foreach ($items as $key) {
-            $temp = array();
-            array_push($temp, $key['date_added']);
-            $sales_date = $this->item_exist($key['product_id']);
-            for ($i=0; $i < count($sales_date); $i++) {
-                if ($i != count($sales_date)-1) {
-                    if ($sales_date[$i] != $sales_date[$i+1]) {
-                        array_push($temp, $sales_date[$i]);
-                    }
-                }else {array_push($temp, $sales_date[$i]);}
-            }
-            $array_hold[$key['product_id']] = array("name" => $key['name'], "dates" => $temp);
-        }
-        // =================== kani ari kay iya ge kuha ang mga average
-        $margin_day = 0; $all_sales= 0; $speeed_margin=0; $all_dates_items = array();
-        foreach ($array_hold as $key) {
-            $days_average = 0; $total_day = 0;
-            if (empty($key['dates']) != 1) {
-                for ($i=0; $i < count($key['dates']); $i++) {
-                    if ($i != count($key['dates'])-1) {
-                        $days = abs(strtotime($key['dates'][$i + 1]) - strtotime($key['dates'][$i]))/86400;
-                        $total_day = $total_day + $days;
-                    }elseif (count($key['dates']) == 1) { $total_day = $total_day + 0; }
-                }
+    public function get_data(){
+        $location =  $this->input->post('location') ? $this->input->post('location') : 'all';
+        $date_from = $this->input->post('date_from') ? $this->input->post('date_from') : Date('Y-m-d', strtotime('first day of this month'));
+        $date_to = $this->input->post('date_to') ? $this->input->post('date_to') : Date('Y-m-d');
 
-                $all_dates_items[$key['name']] = array(
-                    "name" => $key['name'],
-                    "average" => (int)$days_average = $total_day/count($key['dates'])
-                );
-            }
-            $margin_day = $margin_day + (int)$days_average;
-            $all_sales = $all_sales + 1;
+        $glob_date_from = Date('Y-m-d', strtotime($date_from));
+        $glob_date_to = Date('Y-m-d', strtotime($date_to));
+
+        $params['select'] ="*";
+        $res = $this->MY_Model->getRows('tbl_products', $params);
+        $td = array();
+
+        foreach ($res as $key) {
+            $sold = $this->getAllSoldByProduct($glob_date_from, $glob_date_to, $key['product_id'], $location)['total_qty'];
+            $total = $sold * $key['price'];
+
+            $td[] = array(
+                array(
+                    "class" => 'name',
+                    "data" => $key['name']
+                ),
+                array(
+                    "class" => 'sold',
+                    "data" => $sold
+                ),
+                array(
+                    "class" => 'total',
+                    "data" => $total
+                ),
+            );
         }
 
-        // =================== this part kay iya ge segregate ang FAST ug SLOW
-        $speeed_margin =  $margin_day/$all_sales;
-        $fast_moving = array(); $slow_moving= array();
-        foreach ($all_dates_items as $key) {
-            if ($key['average'] > $speeed_margin && $key['average'] != 0) {
-                $slow_moving[] = array(
-                    "average" => $key['average'],
-                    "name" => $key['name'],
-                );
-            }elseif($key['average'] <= $speeed_margin  && $key['average'] != 0) {
-                $fast_moving[] = array(
-                    "average" => $key['average'],
-                    "name" => $key['name'],
-                );
-            }elseif ($key['average'] == 0) {
-                $slow_moving[] = array(
-                    "average" => $key['average'],
-                    "name" => $key['name'],
-                );
-            }
-        }
-        // =================== diri kay pag himo sa display ===================
-        $fast_str = ""; $slow_Str = "";
-        asort($slow_moving); asort($fast_moving);
-        foreach ($slow_moving as $key) {
-            $slow_Str .= "<tr>";
-            $slow_Str .= "<td>".$key['name']."</td>";
-            $slow_Str .= "<td>".$key['average']."</td>";
-            $slow_Str .= "</tr>";
-        }
-
-        foreach ($fast_moving as $key) {
-            $fast_str .= "<tr>";
-            $fast_str .= "<td>".$key['name']."</td>";
-            $fast_str .= "<td>".$key['average']."</td>";
-            $fast_str .= "</tr>";
-        }
-
-        $result = array(
-            "slow" => $slow_Str,
-            "fast" => $fast_str
+        $table_data = array(
+            "header" => array(
+                "Product Name",
+                "Items Sold (Pcs)",
+                "Total Amount Sold (SRP)",
+                ),
+            "data" => $td
         );
 
-        echo json_encode($result);
+        echo json_encode($table_data);
     }
 
-    public function item_exist($id){
-        $today = date('m');
-        $dates_array = array();
-        $params_sold['where'] = "MONTH(date_issued) = $today";
-        $items_sold = $this->MY_Model->getRows('tbl_sales', $params_sold);
-        foreach ($items_sold as $items) {
-            $items_array = json_decode($items['items']);
-            foreach ($items_array as $key) {
-                if ($id == $key->item_id) {
-                    array_push($dates_array, $items['date_issued']);
-                }
-            }
+    public function getAllSoldByProduct($glob_date_from, $glob_date_to, $id, $location) {
+        $params["select"] = 'items';
+        $params['where'] = "(date_issued between '$glob_date_from' and '$glob_date_to')";
+
+        if ($location != 'all') {
+            $params['where'] .= " AND location = " . $location;
         }
-        return $dates_array;
+
+        $res = $this->MY_Model->getRows("tbl_sales", $params);
+
+        $total_count = 0;
+        $total_amt = 0;
+        $total_qty = 0;
+
+        foreach ($res as $key) {
+            $items = json_decode($key["items"]);
+
+            foreach ($items as $it) {
+                if ($it->item_id == $id) {
+                    $total_amt = $total_amt + $it->total;
+                    $total_count = $total_count + 1;
+                    $total_qty = $total_qty + $it->qty;
+                };
+            };
+        };
+
+        $data = array(
+            "total_amount" => $total_amt,
+            "count" => $total_count,
+            "total_qty" => $total_qty,
+        );
+
+        return $data;
     }
-
-
 }
 
 ?>

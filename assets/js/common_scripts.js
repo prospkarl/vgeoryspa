@@ -1,3 +1,27 @@
+function debounce(func, wait, immediate) {
+  var timeout;
+
+  return function() {
+    var context = this,
+      args = arguments;
+
+    var callNow = immediate && !timeout;
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(function() {
+
+      timeout = null;
+
+      if (!immediate) {
+        func.apply(context, args);
+      }
+    }, wait);
+
+    if (callNow) func.apply(context, args);
+  }
+}
+
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -123,7 +147,7 @@ $(document).ready(function() {
         }
     });
 
-    $(document).on('keyup','.autocomplete', function(e) {
+    $(document).on('keyup','.autocomplete', debounce(function(e) {
         $(this).siblings('.autocomplete_holder').val('');
 
         $('.autocomplete_drp-content').removeClass('has-items');
@@ -192,7 +216,7 @@ $(document).ready(function() {
         }else{
             $('.autocomplete_drp-content').css('display','none');
         }
-    });
+    }, 500));
 
 
     if ($('table').length) {
