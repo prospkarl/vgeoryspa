@@ -169,6 +169,7 @@ $(document).on('click', '.action-edit',function(){
             $.each(res, function(key, value){
                 $('.data-'+key).val(value);
             })
+            $('.toggle-log').attr('data-referrer', res.product_id);
         }
     })
 })

@@ -204,7 +204,10 @@
                             <div class="form-group">
                                 <div class="d-flex justify-content-between">
                                     <p class="m-0">CSO Quantity</p>
-                                    <a id="openvoid" tabindex="-1" href="javascript:;" data-toggle="modal" data-target="#void"><i class="fa fa-edit"></i> Edit</a>
+                                    <div>
+                                        <a id="openvoid" tabindex="-1" href="javascript:;" data-toggle="modal" data-target="#void"><i class="fa fa-edit" style="margin-top:-2px" data-toggle="tooltip" data-original-title="Edit Price"></i></a>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#viewLogs" data-tablename="tbl_products" data-referrer="0" class="toggle-log"><i class="fas fa-clipboard-list" data-toggle="tooltip" data-original-title="View History"></i></a>
+                                    </div>
                                 </div>
                                 <input type="number" min="1" name="quantity" class="form-control m-t-5 data-qty esc-input" disabled>
                                 <div class="help-block"></div>

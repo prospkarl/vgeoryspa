@@ -122,6 +122,12 @@ class Common extends MY_Controller {
 		}
 	}
 
+
+	/*
+	* getLogs : Data needed
+	* - referrer_id (REFERENCE ID)
+	* - table_name (TABLE)
+	*/
 	public function getlogs() {
 		$options['select'] = '
 			tbl_logs.content,

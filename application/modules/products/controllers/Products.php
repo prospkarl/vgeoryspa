@@ -118,6 +118,20 @@ class Products extends MY_Controller {
 
 		if ($update) {
 			if (!empty($post['quantity'])) {
+				$check_op['where'] = array('product_id' => $post['product_id'], 'location' => 1);
+				$check_qty = $this->MY_Model->getRows('tbl_stocks', $check_op, 'row_array');
+
+				if ($check_qty['qty'] != $post['quantity']) {
+					$log = 'Quantity changed from '.$check_qty['qty'].' to '. $post['quantity'];
+
+					$log_info = array(
+						'referrer_id' => $post['product_id'],
+						'log' => $log,
+						'logged_by' => $this->session->id
+					);
+					$this->create_log('tbl_products', $log_info);
+				}
+
 				$set = array(
 					'qty' => $post['quantity']
 				);
