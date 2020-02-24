@@ -478,11 +478,10 @@ function dailyDatable(url) {
                {"data":"phy_balance","render" : function(data,type,row) {
                    var str= '';
                         str +='<a href="'+url+'daily_inventory/viewRecord/'+row.daily_id+'"  class="viewRecords btn" style="background: transparent" data-toggle="tooltip" title="" data-original-title="View"><i class="fas fa-eye"></i></a>';
-                        if (control == 1) {
+                        if (control == 1 && row.verified != "1") {
                                 str +='<a href="" data-id='+row.daily_id+' class="deleteRecords btn" style="background: transparent" data-toggle="tooltip" title="" data-original-title="Delete"><i class="fas fa-trash"></i></a>';
                                 control = 2;
                         }
-
                    return str;
                }},
          ],

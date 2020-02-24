@@ -228,15 +228,12 @@ class Purchaseorder extends MY_Controller {
 		if ($result[0]['quantity_received'] != null) {
 			$itemarray = json_decode($result[0]['quantity_received']);
 			$itemarray_og = json_decode($result[0]['items']);
-			// echo "<pre>";
-			// print_r($itemarray_og);
-			// exit;
 			$i = 0;
 			foreach($itemarray as $info) {
 				$para['select'] = "name";
 				$para['where'] = array("product_id" => $info->item_id);
 				$name = $this->MY_Model->getRows('tbl_products',$para,'row_array')['name'];
-				$td[] = array($name,$info->qty, (count($itemarray_og) > $i)? $itemarray_og[$i]->qty : 0,$info->cost_per,$info->total_price);
+				$td[] = array($info->item_id, $name,$info->qty, (count($itemarray_og) > $i)? $itemarray_og[$i]->qty : 0,$info->cost_per,$info->total_price);
 				$i++;
 			}
 		}else {
@@ -245,23 +242,23 @@ class Purchaseorder extends MY_Controller {
 				$para['select'] = "name";
 				$para['where'] = array("product_id" => $info->item_id);
 				$name = $this->MY_Model->getRows('tbl_products',$para,'row_array')['name'];
-				$td[] = array($name,$info->qty, $info->qty,$info->cost_per,$info->total_price);
+				$td[] = array($info->item_id, $name,$info->qty, $info->qty,$info->cost_per,$info->total_price);
 			}
 		}
 
 
 			$table_data = array(
-				"header" => array("Item Name", "Quantity", "To Receive", "Cost per Product", "Total Price"),
-				"data"=>$td
+				"header" => array("ID", "Item Name", "Quantity", "To Receive", "Cost per Product", "Total Price"),
+				"data" => $td
 			);
 
 			$data = array(
-			"poid" =>$result[0]['poid'],
-			"total_unit" =>$result[0]['total_cost'],
-			"total_amount" =>$result[0]['total_qty'],
-			"supplier" => $result[0]['supplier'],
-			"table" => $table_data
-		);
+				"poid" =>$result[0]['poid'],
+				"total_unit" =>$result[0]['total_cost'],
+				"total_amount" =>$result[0]['total_qty'],
+				"supplier" => $result[0]['supplier'],
+				"table" => $table_data
+			);
 		echo json_encode($data);
 	}
 

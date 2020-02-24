@@ -1,21 +1,16 @@
 <div class="card" id="dailyR" data->
     <div class="card-body">
+        <div class="row <?= $this->session->type != 2 ? 'd-flex justify-content-between p-20 p-t-0' : ''?>">
         <?php if ($this->session->type == 2): ?>
-            <div class="row">
                 <div class="col-12 text-right">
                     <a href="<?= base_url('daily_inventory') ?>" class="btn btn-sm btn-info"><i class="fas fa-cube"></i> Daily Inventory</a>
-                    <a href="<?= base_url('request_items') ?>" class="btn btn-sm btn-info"><i class="fas fa-cube"></i> Request More Items</a>
+                    <a href="<?= base_url('request_items') ?>" class="btn btn-sm btn-info"><i class="fas fa-box-open"></i> Request More Items</a>
                 </div>
-            </div>
+        <?php else: ?>
+                <a href="<?= base_url('inventory_movement') ?>" class="btn btn-sm btn-info"><i class="fas fa-cube"></i> Inventory movement</a>
+                <a href="<?= base_url('acquisition') ?>" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Set Pricing Option</a>
         <?php endif; ?>
-
-        <?php if ($this->session->type != 2): ?>
-            <div class="row">
-                <div class="col-12 text-right">
-                    <a href="<?= base_url('acquisition') ?>" class="btn btn-sm btn-info"><i class="fas fa-cube"></i> Set Pricing Option</a>
-                </div>
-            </div>
-        <?php endif; ?>
+        </div>
 
         <div class="row">
             <table id="products" class="table table-bordered table-striped" style="overflow: scroll;">
