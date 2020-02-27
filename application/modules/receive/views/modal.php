@@ -145,7 +145,7 @@
                           <thead>
                               <th>Product Name</th>
                               <th>Expected Qty.</th>
-                              <th>Recieved Qty.</th>
+                              <th>Received Qty.</th>
                           </thead>
                           <tbody class="ari_ibutang">
 

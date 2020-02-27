@@ -270,7 +270,7 @@ class Purchaseorder extends MY_Controller {
 				$para['select'] = "name";
 				$para['where'] = array("product_id" => $info->item_id);
 				$name = $this->MY_Model->getRows('tbl_products',$para,'row_array')['name'];
-				$td[] = array($info->item_id, $name,$info->qty, (count($itemarray_og) > $i)? $itemarray_og[$i]->qty : 0,$info->cost_per,$info->total_price);
+				$td[] = array($info->item_id, $name, (count($itemarray_og) > $i)? $itemarray_og[$i]->qty : 0, $info->qty, $info->cost_per,$info->total_price);
 				$i++;
 			}
 			$table_data = array(
