@@ -24,22 +24,51 @@ $(document).ready(function() {
         });
 
         if (anomaly != 0) {
-            Swal.fire({
-                title: "Warning!",
-                text: "It seems you have received short/excess items from the supplier.",
-                type: "warning",
+            Swal.mixin({
+                confirmButtonText: 'Next &rarr;',
                 showCancelButton: true,
-                cancelButtonColor: 'indianred',
-                cancelButtonText: 'I made a mistake',
-                confirmButtonColor: "#A4A23C",
-                confirmButtonText: "Record Discrepancy",
-            }).then((confirm) => {
-                if (confirm.value) {
+                progressSteps: ['1', '2']
+            }).queue([
+                {
+                    title: 'Warning!',
+                    text: "It seems you have received short/excess items from the supplier.",
+                    confirmButtonColor: "#A4A23C",
+                    confirmButtonText: "Record Discrepancy",
+                    cancelButtonColor: 'indianred',
+                    cancelButtonText: 'I made a mistake',
+                },
+                {
+                    title: 'Wait!',
+                    text: "To record this discrepancy, please tell us what happened",
+                    input: "textarea",
+                    preConfirm: (res) => {
+                        let proceed = true;
+
+                        const msg ={
+                            message: 'Please tell us the reason',
+                            type: 'warning'
+                        }
+
+                        if (res == '') {
+                            proceed = false;
+                            showNotification(msg);
+                        }else {
+                            $('#incidentSector').prepend(
+                                '<input type="hidden" name="reason" value="'+res+'" />'
+                            );
+                        }
+                        return proceed;
+                    }
+                },
+            ]).then((result) => {
+                if (result.value) {
                     submitForm();
                 }else {
                     $('#receiveModal').modal('show');
                 }
-            });
+
+                $('input[name="reason"]').remove();
+            })
         }else {
             submitForm();
         }
@@ -52,13 +81,20 @@ $(document).ready(function() {
             type:'post',
             dataType:'json',
             data:$('#incidentSector').serialize(),
+            beforeSend: function(){
+                $('#incidentSector').find('button[type="submit"]').html('Please wait..').prop('disabled', true);
+            },
             success: function(data) {
                 if (data.type =='success') {
                     purchaseOrder(url, "all");
                     $('#anomalySector1').modal('hide');
                 }
                 showNotification(data);
+                $('input[name="reason"]').remove();
             },
+            complete: function(){
+                $('#incidentSector').find('button[type="submit"]').html('Confirm').prop('disabled', false);
+            }
         })
     }
 
@@ -363,8 +399,15 @@ $(document).ready(function() {
             type:"post",
             dataType: "json",
             data: {id: id},
+            beforeSend: function(){
+                const loader = `<td colspan="100%" class="text-center">
+                                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                                      <span class="sr-only">Loading...</span>
+                                    </div>
+                                </td>`;
+                $('.ari_ibutang').html(loader);
+            },
             success: function(data){
-                // console.log(data);
                 var str = "";
                 if (data.recieved_items.length != 0) {
                     var i = 0;
@@ -374,7 +417,7 @@ $(document).ready(function() {
                             expected = data.items[i].qty;
                         }
                         str += "<tr>";
-                        str += "<td>"+ ajax_a_f_name(url, value.item_id) +"</td>";
+                        str += "<td>"+value.prod_name+"</td>";
                         str += "<td>"+ expected +"</td>";
 
                         if (parseInt(value.qty) != parseInt(expected)) {
@@ -392,6 +435,7 @@ $(document).ready(function() {
                 }
                 // console.log(str);
                 $('.ari_ibutang').html(str);
+                $('.reason_for_disc').html(data.reason);
             }
         });
     });
@@ -445,6 +489,7 @@ function purchaseOrder(url, status) {
        "columnDefs": [
              {
                   "targets"   : [5, 6],
+
                   "orderable" : false,
               },
          ],
@@ -463,7 +508,7 @@ function descTable(url, status) {
        "order"          : [[0,'desc']],
        "columns"        :[
              {"data":"poid"},
-             {"data":"received_date"},
+             {"data":"last_updated"},
              {"data":"name"},
              {"data":"received_by", "render" : function(data, type, row) {
                  var str = '<button type="button" class="descModal btn"  data-toggle="modal" data-stat="'+row.poid+'" data-target="#anomalySector2" style="margin-right: 12px;" data-id="'+row.poid+'"><i class="fas fa-eye" data-toggle="tooltip" title="View"></i></button>';

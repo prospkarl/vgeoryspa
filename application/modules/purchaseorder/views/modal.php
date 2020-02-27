@@ -189,7 +189,7 @@
 </div>
 
 
-<div id="anomalySector1" class="modal" tabindex="-1" role="dialog">
+<div id="anomalySector1" class="modal" role="dialog">
     <div class="modal-dialog modal-lg modal-dialog-centered animated bounceIn show" role="document">
         <div class="modal-content">
         <form id="incidentSector">
@@ -252,13 +252,22 @@
                           <thead>
                               <th>Product Name</th>
                               <th>Expected Qty.</th>
-                              <th>Recieved Qty.</th>
+                              <th>Received Qty.</th>
                           </thead>
                           <tbody class="ari_ibutang">
 
                           </tbody>
                       </table>
                   </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <h3 class="font-weight-bold">Reason:</h3>
+                            <h2 class="reason_for_disc">-</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
           <div class="modal-footer">

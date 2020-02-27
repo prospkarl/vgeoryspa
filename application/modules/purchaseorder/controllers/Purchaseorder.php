@@ -19,17 +19,46 @@ class Purchaseorder extends MY_Controller {
 	}
 
 	public function getItemsPo(){
-
 		$params['where'] = array('poid' => $this->input->post('id'));
 		$res = $this->MY_Model->getRows("tbl_purchase_order", $params);
 
+		$items = json_decode($res[0]['quantity_received']);
+		$req_items = json_decode($res[0]['items']);
+
+		$with_discrepancies = array();
+
+		foreach ($items as $key => $value) {
+			$received_item = $this->get_array_info($req_items, array('item_id' => $value->item_id));
+			if ($received_item->qty != $value->qty) {
+				$value->prod_name = $this->getName($value->item_id);
+				$with_discrepancies[] = $value;
+			}
+		}
+
 		$data = array(
-			"recieved_items" => json_decode($res[0]['quantity_received']),
-			"items" => json_decode($res[0]['items'])
+			"recieved_items" => $with_discrepancies,
+			"items" => json_decode($res[0]['items']),
+			"reason" => $res[0]['reason_for_disc']
 		);
 		echo json_encode($data);
 	}
-	// ========================== Display Ret
+
+	public function get_array_info($array, $find) {
+		foreach ($array as $key => $info) {
+			foreach ($find as $key => $value) {
+				if ($info->{$key} == $value) {
+					return $info;
+				}
+			}
+		}
+	}
+
+	public function getName($prod_id){
+		$params['where'] = array("product_id"=> $prod_id);
+		$res = $this->MY_Model->getRows("tbl_products", $params);
+		return json_encode($res[0]['name']);
+	}
+
 	public function returnSector1(){
 		$params['where'] = array(
 			"poid" => $this->input->post('id')
@@ -356,7 +385,8 @@ class Purchaseorder extends MY_Controller {
 			'received_date' => date('Y-m-d'),
 			'quantity_received' => json_encode($data_arr),
 			'status' => 3,
-			'with_discrepancy' => $with_discrepancy
+			'with_discrepancy' => $with_discrepancy,
+			'reason_for_disc' => $this->input->post('reason') ? $this->input->post('reason') : null
 		);
 
 		$res = $this->MY_Model->update('tbl_purchase_order', $data, $where);
@@ -389,12 +419,6 @@ class Purchaseorder extends MY_Controller {
 		}else {
 			ajax_response('Receive Unsuccessful', 'error');
 		}
-	}
-
-	public function getName(){
-		$params['where'] = array("product_id"=> $this->input->post('id'));
-		$res = $this->MY_Model->getRows("tbl_products", $params);
-		echo json_encode($res[0]['name']);
 	}
 
 // =================================== datatable Purchase
