@@ -12,7 +12,7 @@ class Common extends MY_Controller {
         $this->db->limit(5);
         $params['select'] = '*';
 
-		if (strpos($inputted, ' ')) {
+		if (!is_numeric($inputted)) {
 			$keywords = explode(' ', $inputted);
 
 			foreach ($keywords as $key) {

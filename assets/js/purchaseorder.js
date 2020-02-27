@@ -137,6 +137,11 @@ $(document).ready(function() {
     //     alert(toRecieve);
     // });
 
+    $(document).on('click', '.autocomplete', function(){
+        $(this).val('');
+    })
+
+
     $(document).on('change', '.qty_num',function() {
         var qty = $(this).val();
         $(this).parent().parent().find('.stockAfter').html(parseInt($(this).parent().parent().find(".stockAfter").data('stock')) + parseInt(qty));
@@ -171,10 +176,10 @@ $(document).ready(function() {
                         $(this).find('button[type="submit"]').html('Please wait...').prop('disabled', true);
                     },
                     success: function(data) {
-                        purchaseOrder(url, "all");
-                        if (data.data['data'] != 'error') {
+                        if (data.type == 'success') {
                             $('#purchaseModal').modal('hide');
                             showNotification(data);
+                            purchaseOrder(url, "all");
                         }else {
                             showNotification(data);
                         }

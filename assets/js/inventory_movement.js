@@ -13,6 +13,10 @@ function getData(){
         },
         success:function(res){
             generateTableInput(res, "#inventory_movement_table");
+            $('#inventory_movement_table').DataTable({
+                "paging" : false,
+                "order" : [[ 0, "asc" ]],
+            })
         },
         complete: function(){
             setTimeout(function () {

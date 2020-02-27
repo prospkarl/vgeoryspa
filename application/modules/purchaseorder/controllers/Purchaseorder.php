@@ -19,7 +19,6 @@ class Purchaseorder extends MY_Controller {
 	}
 
 	public function getItemsPo(){
-
 		$params['where'] = array('poid' => $this->input->post('id'));
 		$res = $this->MY_Model->getRows("tbl_purchase_order", $params);
 
@@ -180,8 +179,15 @@ class Purchaseorder extends MY_Controller {
 		echo json_encode($res);
 	}
 // ================================== add purchase
-	public function addPurchaseOrder()
-	{
+	public function addPurchaseOrder() {
+		if (!empty($this->input->post('quantity'))) {
+			foreach ($this->input->post('quantity') as $key => $value) {
+				if ($value == '0' || $value == '') {
+					ajax_response('Please select an item', 'error');
+				}
+			}
+		}
+
 		$total_qty = 0; $total_price = 0; $item_list = array();
 		if (is_array($this->input->post('totPrice')) ) {
 			for ($i=0; $i < count($this->input->post('quantity')); $i++) {
@@ -224,6 +230,7 @@ class Purchaseorder extends MY_Controller {
 		);
 		$result = $this->MY_Model->getRows('tbl_purchase_order', $params);
 		$td = array();
+		$table_data = array();
 
 		if ($result[0]['quantity_received'] != null) {
 			$itemarray = json_decode($result[0]['quantity_received']);
@@ -236,21 +243,26 @@ class Purchaseorder extends MY_Controller {
 				$td[] = array($info->item_id, $name,$info->qty, (count($itemarray_og) > $i)? $itemarray_og[$i]->qty : 0,$info->cost_per,$info->total_price);
 				$i++;
 			}
+			$table_data = array(
+				"header" => array("ID", "Item Name", "Qty Requested", "Item Received", "Cost per Product", "Total Price"),
+				"data" => $td
+			);
 		}else {
 			$itemarray = json_decode($result[0]['items']);
-			foreach($itemarray as $info) {
+
+			foreach($itemarray as $key => $info) {
 				$para['select'] = "name";
 				$para['where'] = array("product_id" => $info->item_id);
 				$name = $this->MY_Model->getRows('tbl_products',$para,'row_array')['name'];
 				$td[] = array($info->item_id, $name,$info->qty, $info->qty,$info->cost_per,$info->total_price);
 			}
-		}
-
-
 			$table_data = array(
 				"header" => array("ID", "Item Name", "Quantity", "To Receive", "Cost per Product", "Total Price"),
 				"data" => $td
 			);
+		}
+
+
 
 			$data = array(
 				"poid" =>$result[0]['poid'],

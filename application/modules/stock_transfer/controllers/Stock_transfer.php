@@ -175,7 +175,7 @@ class Stock_transfer extends MY_Controller {
 		$result = false;
 
 		if ($res) {
-			$result = true;
+			$result = $res;
 		}
 
 		return $result;

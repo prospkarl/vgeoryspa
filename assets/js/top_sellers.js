@@ -17,9 +17,9 @@ function initDatatable() {
     var x = 1;
     var dataTable_top = $('#topsellers').DataTable({
            "destroy"        : true,
+           "paging"         : false,
            "processing"     : true,
            "serverSide"     : true,
-           "order"          : [[1,'desc']],
            "columns"        :[
                  {"data":"user_id","render":function (data, type, row, meta) {
                      var rank = meta.row + meta.settings._iDisplayStart + 1;
@@ -65,6 +65,7 @@ function initDatatable() {
            "destroy"        : true,
            "processing"     : true,
            "serverSide"     : true,
+           "paging"         : false,
            "order"          : [[0,'desc']],
            "columns"        :[
                  {"data":"location_id", "render":function (data, type, row, meta) {
