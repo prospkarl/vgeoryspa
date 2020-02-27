@@ -266,9 +266,8 @@ class Daily_inventory extends MY_Controller
         );
         $res = $this->MY_Model->getRows('tbl_stocks', $params);
 
-
         $td = array();
-
+        
         if ($action == 'ending') {
             foreach ($res as $key => $value) {
                 $t_ins =($value['total_ins'] != '') ? $value['total_ins'] : 0;

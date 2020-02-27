@@ -19,6 +19,7 @@ class Purchaseorder extends MY_Controller {
 	}
 
 	public function getItemsPo(){
+
 		$params['where'] = array('poid' => $this->input->post('id'));
 		$res = $this->MY_Model->getRows("tbl_purchase_order", $params);
 

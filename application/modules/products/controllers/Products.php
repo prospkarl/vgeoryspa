@@ -117,9 +117,10 @@ class Products extends MY_Controller {
 		$update = $this->MY_Model->update('tbl_products', $update_product, $where);
 
 		if ($update) {
-			if (!empty($post['quantity'])) {
-				$check_op['where'] = array('product_id' => $post['product_id'], 'location' => 1);
-				$check_qty = $this->MY_Model->getRows('tbl_stocks', $check_op, 'row_array');
+			$check_op['where'] = array('product_id' => $post['product_id'], 'location' => 1);
+			$check_qty = $this->MY_Model->getRows('tbl_stocks', $check_op, 'row_array');
+
+			if ($check_qty['qty'] != $post['quantity']) {
 
 				if ($check_qty['qty'] != $post['quantity']) {
 					$log = 'Quantity changed from '.$check_qty['qty'].' to '. $post['quantity'];

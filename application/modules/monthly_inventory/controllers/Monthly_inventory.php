@@ -407,7 +407,10 @@ class Monthly_inventory extends MY_Controller
         $lastDay = date("Y-m-t");
         $current_month = date("F", strtotime(date('Y-m-d'))) ." ". date("Y");
 
-        $params['select'] = "*, (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND  item_id = tbl_products.product_id AND type=0 AND date_added between '$firstDay' and '$lastDay') as total_in, (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type= 1 AND date_added between '$firstDay' and '$lastDay') as total_out";
+        $params['select'] = "*,
+        (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type = 0 AND date_added between '$firstDay' and '$lastDay') as total_in,
+        (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type= 1 AND date_added between '$firstDay' and '$lastDay') as total_out
+        ";
 
         $res = $this->MY_Model->getRows('tbl_products', $params);
 

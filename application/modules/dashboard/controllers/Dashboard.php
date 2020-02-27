@@ -383,8 +383,19 @@ class Dashboard extends MY_Controller {
 		$target_sales = $this->get_option('target_sales_week');
 
 		foreach ($data_set as $nothing) {
-			$target_array[] = $target_sales;
+			switch ($time_frame) {
+				case 'week':
+				$target_array[] = $target_sales / 7;
+				break;
+				case 'month':
+				$target_array[] = $target_sales / 4;
+				break;
+				case 'year':
+				$target_array[] = $target_sales / 12;
+				break;
+			}
 		}
+
 
 		$final_results['series'][] = array(
 			'name' => 'Target',
@@ -610,6 +621,7 @@ class Dashboard extends MY_Controller {
 		$dates = $this->get_dates($time_frame);
 
 		$sales_options['select'] = 'SUM(total_amount) as total_amount';
+		$sales_previous_options['select'] = 'SUM(total_amount) as total_amount';
 
 		$sales_options['where']['status'] = 1;
 		$sales_previous_options['where']['status'] = 1;
@@ -623,7 +635,6 @@ class Dashboard extends MY_Controller {
 
 		$sales_options['where_sub'] = "date_issued between '".$dates['current']['start_date']."' and '".$dates['current']['end_date']."'";
 		$sales = $this->MY_Model->getRows('tbl_sales', $sales_options, 'row_array');
-
 
 		$difference = $sales['total_amount'] - $sales_previous['total_amount'];
 

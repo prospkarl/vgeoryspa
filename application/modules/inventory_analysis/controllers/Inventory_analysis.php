@@ -36,7 +36,7 @@ class Inventory_analysis extends MY_Controller {
                 ),
                 array(
                     "class" => 'total',
-                    "data" => $total
+                    "data" => number_format($total, 2)
                 ),
             );
         }
@@ -44,8 +44,8 @@ class Inventory_analysis extends MY_Controller {
         $table_data = array(
             "header" => array(
                 "Product Name",
-                "Items Sold (Pcs)",
-                "Total Amount Sold (SRP)",
+                "Items Sold (pcs)",
+                "Total Amount Sold (₱)",
                 ),
             "data" => $td
         );

@@ -15,7 +15,7 @@ class Top_sellers extends MY_Controller {
 		$search = $this->input->post('search');
 		$order = $this->input->post('order');
 		$draw = $this->input->post('draw');
-		$column_order = array('user_id', 'user_id');
+		$column_order = array('user_id','tbl_user_details.fname');
 		$join = array();
 		$where = array("position" => "Sales",);
 		$select ="

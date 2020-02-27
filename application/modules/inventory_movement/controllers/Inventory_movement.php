@@ -33,7 +33,7 @@ class Inventory_movement extends MY_Controller {
             $td[] = array(
                 array(
                     "class" => 'name',
-                    "data" => $key['name'] 
+                    "data" => $key['name']
                 ),
                 array(
                     "class" => 'beg_bal',

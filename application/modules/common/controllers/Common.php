@@ -11,7 +11,7 @@ class Common extends MY_Controller {
         $this->db->distinct();
         $this->db->limit(5);
         $params['select'] = '*';
-
+		
 		if (!is_numeric($inputted)) {
 			$keywords = explode(' ', $inputted);
 

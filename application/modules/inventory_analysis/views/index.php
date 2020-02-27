@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group">
-                            <label for="select-label">Status:</label>
+                            <label for="select-label">Location:</label>
                             <select class="form-control form-control-sm status" name="location" style="min-width:200px;">
                                 <option value="" selected>All</option>
                                 <?php render_options($locations, 'location_id', 'name') ?>

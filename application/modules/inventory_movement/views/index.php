@@ -16,7 +16,13 @@
 
                 <div class="row justify-content-md-center m-b-40">
                     <div class="col-md-12 responsive-table">
-                        <table id="inventory_movement_table" class="table table-bordered table-striped stat"> </table>
+                        <table id="inventory_movement_table" class="table table-bordered table-striped stat">
+                            <td colspan="100%" style="text-align:center">
+                                <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                                  <span class="sr-only">Loading...</span>
+                                </div>
+                            </td>
+                         </table>
                     </div>
                 </div>
             </div>
