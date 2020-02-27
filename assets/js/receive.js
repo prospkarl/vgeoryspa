@@ -185,7 +185,7 @@ $(document).ready(function(){
                             expected = data.items[i].qty;
                         }
                         str += "<tr>";
-                        str += "<td>"+ ajax_a_f_name(base_url, value.item_id) +"</td>";
+                        str += "<td>"+value.prod_name+"</td>";
                         str += "<td>"+ expected +"</td>";
 
                         if (parseInt(value.qty) != parseInt(expected)) {
@@ -204,6 +204,7 @@ $(document).ready(function(){
                 }
                 // console.log(str);
                 $('.ari_ibutang').html(str);
+                $('.reason_for_disc').html(data.reason);
             }
         });
     });
@@ -255,22 +256,71 @@ $(document).ready(function(){
         });
 
         if (anomaly) {
-            Swal.fire({
-                title: "Warning!",
-                text: "It seems you have received short/excess items.",
-                type: "warning",
+            Swal.mixin({
+                confirmButtonText: 'Next &rarr;',
                 showCancelButton: true,
-                cancelButtonColor: 'indianred',
-                cancelButtonText: 'I made a mistake',
-                confirmButtonColor: "#A4A23C",
-                confirmButtonText: "Record Discrepancy",
-            }).then((confirm) => {
-                if (confirm.value) {
+                progressSteps: ['1', '2']
+            }).queue([
+                {
+                    title: 'Warning!',
+                    text: "It seems you have received short/excess items from the supplier.",
+                    confirmButtonColor: "#A4A23C",
+                    confirmButtonText: "Record Discrepancy",
+                    cancelButtonColor: 'indianred',
+                    cancelButtonText: 'I made a mistake',
+                },
+                {
+                    title: 'Wait!',
+                    text: "To record this discrepancy, please tell us what happened",
+                    input: "textarea",
+                    confirmButtonColor: "#A4A23C",
+                    confirmButtonText: "Submit",
+                    preConfirm: (res) => {
+                        let proceed = true;
+
+                        const msg ={
+                            message: 'Please tell us the reason',
+                            type: 'warning'
+                        }
+
+                        if (res == '') {
+                            proceed = false;
+                            showNotification(msg);
+                        }else {
+                            $('#incidentSector').prepend(
+                                '<input type="hidden" name="reason" value="'+res+'" />'
+                            );
+                        }
+                        return proceed;
+                    }
+                },
+            ]).then((result) => {
+                if (result.value) {
                     submitForm();
                 }else {
                     $('#receiveModal').modal('show');
                 }
-            });
+
+                $('input[name="reason"]').remove();
+            })
+
+
+            // Swal.fire({
+            //     title: "Warning!",
+            //     text: "It seems you have received short/excess items.",
+            //     type: "warning",
+            //     showCancelButton: true,
+            //     cancelButtonColor: 'indianred',
+            //     cancelButtonText: 'I made a mistake',
+            //     confirmButtonColor: "#A4A23C",
+            //     confirmButtonText: "Record Discrepancy",
+            // }).then((confirm) => {
+            //     if (confirm.value) {
+            //         submitForm();
+            //     }else {
+            //         $('#receiveModal').modal('show');
+            //     }
+            // });
         }else {
             submitForm();
         }

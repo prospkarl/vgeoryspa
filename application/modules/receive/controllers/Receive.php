@@ -74,7 +74,8 @@ class Receive extends MY_Controller {
 			'total_amount' => $total_pass_cost,
 			'date_received' => date('Y-m-d'),
 			'received_by' => $this->session->id,
-			'status' => 1
+			'status' => 1,
+			'reason_for_disc' => $this->input->post('reason') ? $this->input->post('reason') : null
 		);
 
 		$where = array(
@@ -378,27 +379,50 @@ class Receive extends MY_Controller {
 		}
 	}
 
-	public function getName(){
-
+	public function getName($prod_id){
 		$params['select'] = "*, (SELECT name from tbl_products where product_id = tbl_stocks.product_id) as name";
-		$params['where'] = array("product_id"=> $this->input->post('id'));
+		$params['where'] = array("product_id"=> $prod_id);
 		$res = $this->MY_Model->getRows("tbl_stocks", $params);
 
 		// $res = $this->MY_Model->getRows("tbl_products", $params);
-		echo json_encode($res[0]['name']);
+		return json_encode($res[0]['name']);
 	}
 
 
 	public function getItemsPo(){
 		$params['where'] = array('transfer_id' => $this->input->post('id'));
-		$res = $this->MY_Model->getRows("tbl_stocktransfer", $params);
+		$res = $this->MY_Model->getRows("tbl_stocktransfer", $params, 'row_array');
+
+		$items = json_decode($res['items_received']);
+		$req_items = json_decode($res['items']);
+
+		$with_discrepancies = array();
+
+		foreach ($items as $key => $value) {
+			$received_item = $this->get_array_info($req_items, array('item_id' => $value->item_id));
+			if ($received_item->qty != $value->qty) {
+				$value->prod_name = $this->getName($value->item_id);
+				$with_discrepancies[] = $value;
+			}
+		}
 
 		$data = array(
-			"recieved_items" => json_decode($res[0]['items_received']),
-			"items" => json_decode($res[0]['items'])
+			"recieved_items" => $with_discrepancies,
+			"items" => json_decode($res['items']),
+			"reason" => $res['reason_for_disc'] ? $res['reason_for_disc'] : 'None'
 		);
 
 		echo json_encode($data);
+	}
+
+	public function get_array_info($array, $find) {
+		foreach ($array as $key => $info) {
+			foreach ($find as $key => $value) {
+				if ($info->{$key} == $value) {
+					return $info;
+				}
+			}
+		}
 	}
 
 	public function receiveDatatable() {

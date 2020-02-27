@@ -38,7 +38,7 @@ class Purchaseorder extends MY_Controller {
 		$data = array(
 			"recieved_items" => $with_discrepancies,
 			"items" => json_decode($res[0]['items']),
-			"reason" => $res[0]['reason_for_disc']
+			"reason" => $res[0]['reason_for_disc'] ? $res[0]['reason_for_disc'] : 'None'
 		);
 		echo json_encode($data);
 	}

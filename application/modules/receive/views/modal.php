@@ -153,7 +153,15 @@
                       </table>
                   </div>
               </div>
-
+              <hr />
+              <div class="row">
+                  <div class="col-12">
+                      <div class="form-group">
+                          <h3 class="font-weight-bold">Reason:</h3>
+                          <h2 class="reason_for_disc">-</h2>
+                      </div>
+                  </div>
+              </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
