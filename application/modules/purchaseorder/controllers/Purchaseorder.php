@@ -20,26 +20,35 @@ class Purchaseorder extends MY_Controller {
 
 	public function getItemsPo(){
 		$params['where'] = array('poid' => $this->input->post('id'));
-		$res = $this->MY_Model->getRows("tbl_purchase_order", $params);
+		$res = $this->MY_Model->getRows("tbl_purchase_order", $params, 'row_array');
 
-		$items = json_decode($res[0]['quantity_received']);
-		$req_items = json_decode($res[0]['items']);
+		$items = json_decode($res['quantity_received']);
+		$req_items = json_decode($res['items']);
 
 		$with_discrepancies = array();
 
 		foreach ($items as $key => $value) {
 			$received_item = $this->get_array_info($req_items, array('item_id' => $value->item_id));
-			if ($received_item->qty != $value->qty) {
-				$value->prod_name = $this->getName($value->item_id);
-				$with_discrepancies[] = $value;
-			}
+            if (is_object($received_item)) {
+                if ($received_item->qty != $value->qty) {
+                    $value->prod_name = $this->getName($value->item_id);
+                    $value->requested_qty = $received_item->qty;
+                    $with_discrepancies[] = $value;
+                }
+            }else {
+                if ($received_item['qty'] != $value->qty) {
+                    $value->prod_name = $this->getName($value->item_id);
+                    $value->requested_qty = $received_item['qty'];
+                    $with_discrepancies[] = $value;
+                }
+            }
 		}
 
 		$data = array(
-			"recieved_items" => $with_discrepancies,
-			"items" => json_decode($res[0]['items']),
-			"reason" => $res[0]['reason_for_disc'] ? $res[0]['reason_for_disc'] : 'None'
+			"discrepancy_items" => $with_discrepancies,
+			"reason" => $res['reason_for_disc'] ? $res['reason_for_disc'] : 'None'
 		);
+
 		echo json_encode($data);
 	}
 

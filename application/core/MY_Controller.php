@@ -339,6 +339,10 @@ class MY_Controller extends MX_Controller {
 				'monthlyinventory' => array(
 					'title' => 'Monthly Inventory',
 					'link' => 'monthly_inventory',
+				),
+				'discrepancy' => array(
+					'title' => 'Discrepancies',
+					'link' => 'discrepancy',
 				)
 			)
 		);

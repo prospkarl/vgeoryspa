@@ -409,22 +409,13 @@ $(document).ready(function() {
             },
             success: function(data){
                 var str = "";
-                if (data.recieved_items.length != 0) {
+                if (data.discrepancy_items.length != 0) {
                     var i = 0;
-                    $.each(data.recieved_items, function(index, value) {
-                        var expected = 0;
-                        if (data.items.length > i) {
-                            expected = data.items[i].qty;
-                        }
+                    $.each(data.discrepancy_items, function(index, value) {
                         str += "<tr>";
-                        str += "<td>"+value.prod_name+"</td>";
-                        str += "<td>"+ expected +"</td>";
-
-                        if (parseInt(value.qty) != parseInt(expected)) {
-                            str += "<td style='font-weight:bold; color:indianred'>"+ value.qty +"</td>";
-                        }else {
-                            str += "<td>"+ value.qty +"</td>";
-                        }
+                        str     += "<td>"+ value.prod_name+"</td>";
+                        str     += "<td>"+ (value.requested_qty != null ? value.requested_qty : 0) +"</td>";
+                        str     += "<td class='text_red'>"+ value.qty +"</td>";
                         str += "</tr>";
                         i++;
                     });
