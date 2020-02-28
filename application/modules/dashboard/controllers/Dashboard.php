@@ -106,7 +106,7 @@ class Dashboard extends MY_Controller {
 
 		$low_stock_count = $this->MY_Model->getRows('tbl_stocks', $low_stock_options, 'count');
 
-		$data['low_stock_count'] = $low_stock_count;
+		$data['low_stock_count'] = $low_stock_count - 1;
 
 		# For delivery
 		$delivery_options['where'] = array('status' => 0, 'location_from' => 1);
