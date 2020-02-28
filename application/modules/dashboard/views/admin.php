@@ -96,7 +96,7 @@
                 <div class="d-flex p-10 no-block">
                     <div class="align-slef-center">
                         <h1 class="m-b-1"><?= $low_stock_count ?></h1>
-                        <h5 class="text-muted m-b-0">Consolidated Low stock Items</h5>
+                        <h5 class="text-muted m-b-0">Low Stock Items</h5>
                     </div>
                     <div class="align-self-center display-6 ml-auto"><i class="text-danger mdi mdi-package-down"></i></div>
                 </div>
