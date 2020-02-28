@@ -13,6 +13,7 @@ class Discrepancy extends MY_Controller {
     public function getDiscrepancies() {
         $this->DiscrepancyModel->set_variables();
         $discrepancies = $this->DiscrepancyModel->getDiscrepancies();
+        $td = array();
 
         foreach ($discrepancies as $key => $disc_info) {
             $td[] = array(
