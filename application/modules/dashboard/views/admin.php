@@ -24,7 +24,7 @@
 </div>
 <!-- Column -->
 <!-- Column -->
-<div class="col-lg-4 col-md-6 dashboard-btn" data-link="sales_order">
+<div class="col-lg-4 col-md-6 dashboard-btn" data-link="reports">
     <div class="card">
         <div class="card-body">
             <div class="d-flex p-10 no-block">
