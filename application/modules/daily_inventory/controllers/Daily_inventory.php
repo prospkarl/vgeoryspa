@@ -118,8 +118,10 @@ class Daily_inventory extends MY_Controller
         $inventory_info_op['select'] = 'date_from, date';
         $inventory_info_op['where'] = array('daily_id' => $inventory_id);
         $inventory_info = $this->MY_Model->getRows('tbl_daily_inventory', $inventory_info_op, 'row_array');
+
         $begin = new DateTime(date("Y-m-01", strtotime($inventory_info['date_from'])));
-        $end = new DateTime(date("Y-m-t", strtotime($inventory_info['date'])));
+        $end = new DateTime(date("Y-m-t", strtotime($inventory_info['date_from'])));
+
         $end = $end->modify('+1 day');
         $interval = new DateInterval('P1D');
         $daterange = new DatePeriod($begin, $interval, $end);
@@ -132,6 +134,7 @@ class Daily_inventory extends MY_Controller
                 array_push($days, $date->format("d"));
             }
         }
+
         $params['select'] = "product_id, (SELECT name FROM tbl_products WHERE product_id = tbl_stocks.product_id) as name";
         $params['where'] = array("location" => $this->session->location);
         $res = $this->MY_Model->getRows("tbl_stocks", $params);
@@ -180,7 +183,7 @@ class Daily_inventory extends MY_Controller
         $inventory_info_op['where'] = array('daily_id' => $inventory_id);
         $inventory_info = $this->MY_Model->getRows('tbl_daily_inventory', $inventory_info_op, 'row_array');
         $begin = new DateTime(date("Y-m-01", strtotime($inventory_info['date_from'])));
-        $end = new DateTime(date("Y-m-t", strtotime($inventory_info['date'])));
+        $end = new DateTime(date("Y-m-t", strtotime($inventory_info['date_from'])));
         $end = $end->modify('+1 day');
         $interval = new DateInterval('P1D');
         $daterange = new DatePeriod($begin, $interval, $end);
@@ -267,7 +270,7 @@ class Daily_inventory extends MY_Controller
         $res = $this->MY_Model->getRows('tbl_stocks', $params);
 
         $td = array();
-        
+
         if ($action == 'ending') {
             foreach ($res as $key => $value) {
                 $t_ins =($value['total_ins'] != '') ? $value['total_ins'] : 0;

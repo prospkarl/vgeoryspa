@@ -105,13 +105,13 @@ class Sales_inventory extends MY_Controller {
 		$location_products = $this->MY_Model->getRows('tbl_stocks', $location_products);
 
 		foreach ($location_products as $prod_info) {
-			$beginning = $prod_info['pass_on_cost'] * $this->getBeginningByProduct($start_date, $end_date, $prod_info['product_id']);
+			$beginning = $prod_info['pass_on_cost'] * (int)$this->getBeginningByProduct($start_date, $end_date, $prod_info['product_id']);
 			$sold = $this->getSalesByProduct($start_date, $end_date, $prod_info['product_id'], $location)['total_sales'];
 			$discounts = $this->getSalesByProduct($start_date, $end_date, $prod_info['product_id'], $location)['discounts'];
-			$deliveries = $prod_info['pass_on_cost'] * $this->getAllDeliveriesByProduct($start_date, $end_date, $prod_info['product_id'], $location)['qty'];
-			$transfer = $prod_info['pass_on_cost'] * $this->getAllTransfersByProduct($start_date, $end_date, $prod_info['product_id'], $location)['qty'];
-			$ending = $prod_info['pass_on_cost'] * $this->getEndingByProduct($start_date, $end_date, $prod_info['product_id'])['end_qty'];
-			$actual_ending = $prod_info['pass_on_cost'] * $this->getEndingByProduct($start_date, $end_date, $prod_info['product_id'])['phy_qty'];
+			$deliveries = $prod_info['pass_on_cost'] * (int) $this->getAllDeliveriesByProduct($start_date, $end_date, $prod_info['product_id'], $location)['qty'];
+			$transfer = $prod_info['pass_on_cost'] * (int) $this->getAllTransfersByProduct($start_date, $end_date, $prod_info['product_id'], $location)['qty'];
+			$ending = $prod_info['pass_on_cost'] * (int) $this->getEndingByProduct($start_date, $end_date, $prod_info['product_id'])['end_qty'];
+			$actual_ending = $prod_info['pass_on_cost'] * (int) $this->getEndingByProduct($start_date, $end_date, $prod_info['product_id'])['phy_qty'];
 			$cog = ($beginning + $deliveries) - $ending;
 
 			$td[] = array(
