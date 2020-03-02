@@ -2,12 +2,12 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Monthly_inventory extends MY_Controller
-{
+class Monthly_inventory extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->helper(array('form', 'url'));
         $this->load->library('session');
+
     }
 
     public function index() {
@@ -38,19 +38,29 @@ class Monthly_inventory extends MY_Controller
         $daysleft = $timeDiff/86400;
         $daysleft = intval($daysleft);
 
-        $date_to = date("Y-m-d");
-        $try['where'] = "date_to = '$date_to' OR date_from= '$date_to'";
-        $isRecorded = $this->MY_Model->getRows('tbl_monthly_inventory', $try);
+        $current_month = date("F Y");
+        $is_recorded_op['where'] = array('month_of_record' => $current_month);
+        $isRecorded = $this->MY_Model->getRows('tbl_monthly_inventory', $is_recorded_op);
+
         $isGood ='';
         if (count($isRecorded) > 0) {
             $isGood = 'success';
         }
-        $try = $this->session->userdata('recorded');
+
+        $check_date = Date('F Y', strtotime('-1 months'));
+        $check_prev_inv_op['where'] = array('month_of_record' => $check_date);
+        $check_prev_inv = $this->MY_Model->getRows('tbl_monthly_inventory', $check_prev_inv_op, 'count');
+
+        if (!$check_prev_inv) {
+            $daysleft = 0;
+        }
+
         $data = array(
             "date_due" =>$add_one_day,
             "daysleft" => $daysleft,
             "istoday_record" => $isGood
         );
+
         echo json_encode($data);
     }
 
@@ -321,10 +331,11 @@ class Monthly_inventory extends MY_Controller
 
     public function recordInventory() {
         $recorded_items = array();
-        $date_now = date("Y-m", strtotime("-1 months"));
-        $firstDay= date("Y-m-01");
-        $lastDay = date("Y-m-t");
-        $current_month = date("F", strtotime(date('Y-m-d'))) ." ". date("Y");
+        $firstDay = $this->input->post('date_from');
+        $lastDay =  $this->input->post('date_to');
+
+        $current_month = date("F Y", strtotime($firstDay));
+
         for ($i=0; $i < count($this->input->post('item_id')) ; $i++) {
             $recorded_items[] = array(
                 "item_id" =>$this->input->post('item_id')[$i],
@@ -398,18 +409,34 @@ class Monthly_inventory extends MY_Controller
     }
 
     public function recordView() {
-        $this->load_page('record_inventory');
+        $start_date = Date("Y-m-01");
+        $to_date = Date("Y-m-t");
+
+        $check_date = Date('F Y', strtotime('-1 months'));
+        $check_prev_inv_op['where'] = array('month_of_record' => $check_date);
+        $check_prev_inv = $this->MY_Model->getRows('tbl_monthly_inventory', $check_prev_inv_op, 'count');
+
+        if (!$check_prev_inv) {
+            $start_date = Date("Y-m-01", strtotime('-1 months'));
+            $to_date = Date("Y-m-t", strtotime('-1 months'));
+        }
+
+        $data['coverage'] = array(
+            'from_date_text' => Date('F d, Y', strtotime($start_date)),
+            'to_date_text'   => Date('F d, Y', strtotime($to_date)),
+            'from_date' => $start_date,
+            'to_date'   => $to_date
+        );
+        $this->load_page('record_inventory', $data);
     }
 
     public function recordContent() {
-        $date_now = date("Y-m", strtotime("-1 months"));
-        $firstDay= date("Y-m-01");
-        $lastDay = date("Y-m-t");
-        $current_month = date("F", strtotime(date('Y-m-d'))) ." ". date("Y");
+        $firstDay = $this->input->post('date_from');
+        $lastDay = $this->input->post('date_to');
 
         $params['select'] = "*,
-        (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type = 0 AND date_added between '$firstDay' and '$lastDay') as total_in,
-        (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type= 1 AND date_added between '$firstDay' and '$lastDay') as total_out
+            (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type = 0 AND date_added between '$firstDay' and '$lastDay') as total_in,
+            (SELECT SUM(item_qty) FROM tbl_inventory_movement WHERE location = 1 AND item_id = tbl_products.product_id AND type= 1 AND date_added between '$firstDay' and '$lastDay') as total_out
         ";
 
         $res = $this->MY_Model->getRows('tbl_products', $params);

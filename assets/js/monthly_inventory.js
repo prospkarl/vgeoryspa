@@ -47,7 +47,10 @@ $(document).ready(function() {
         url: url + "monthly_inventory/recordContent",
         type:'post',
         dataType:'json',
-        data: {},
+        data: {
+            date_from: $('input[name="date_from"]').val(),
+            date_to: $('input[name="date_to"]').val(),
+        },
         success: function(data) {
           generateTableInput(data.table,"#recordSales");
       }

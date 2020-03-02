@@ -4,7 +4,9 @@
         <div class="row m-b-40">
             <div class="col-md-6">
                 <h4 class="text-themecolor font-weight-bold">Coverage: </h4>
-                <h6 class="coverage"></h6>
+                <h6 class="coverage"><?= $coverage['from_date_text'] . ' - ' . $coverage['to_date_text']; ?></h6>
+                <input type="hidden" name="date_from" value="<?= $coverage['from_date'] ?>">
+                <input type="hidden" name="date_to" value="<?= $coverage['to_date'] ?>">
             </div>
         </div>
         <div class="row m-b-30">
