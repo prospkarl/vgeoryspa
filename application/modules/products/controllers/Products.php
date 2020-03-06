@@ -234,9 +234,12 @@ class Products extends MY_Controller {
 
 		if ($this->session->type != 2) {
 			$select .= "tbl_products.product_id as editable,";
-			$select .= "tbl_products.beg_bal as beg_balance";
+		}
+
+		if ($this->input->post('location') == 1) {
+			$select .= " tbl_products.beg_bal as beg_balance";
 		}else {
-			$select .= " (SELECT beg_balance from tbl_beginning_bal where location = " . $this->session->location . " and product_id = `tbl_products`.`product_id`) as beg_balance";
+			$select .= " (SELECT beg_balance from tbl_beginning_bal where location = " . $this->input->post('location'). " and product_id = `tbl_products`.`product_id`) as beg_balance";
 		}
 
         $join = array(
