@@ -39,6 +39,11 @@ $(document).ready(function() {
             $(".total_sales").html(data.total_sales);
             $(".total_purchase").html(data.total_purchase);
             $(".profit").html(data.profit);
+
+            $('#all_rec_items').DataTable({
+                paging: false,
+                order: [[0,'asc']]
+            })
         }
     });
 
