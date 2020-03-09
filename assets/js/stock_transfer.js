@@ -113,8 +113,6 @@ $(document).ready(function() {
         $(this).parents('tr').before(str);
     });
 
-
-
     $(document).on('keyup change', '.qty_num',function() {
         var qty = $(this).val();
         var current_stocks = $(this).parents('tr').find(".warehouse_stock").data('stock');
@@ -180,6 +178,7 @@ $(document).ready(function() {
                 $(self).parents('tr').find(".afterDest").html(res.dest_qty);
                 $(self).parents('tr').find(".dest_stock").attr('data-stock', res.dest_qty);
                 $(self).parents('tr').find(".dest_stock").html(res.dest_qty);
+                $(self).parents('tr').find(".autocomplete").attr('readonly', 1);
             }
         })
     });
