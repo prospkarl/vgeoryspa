@@ -413,6 +413,7 @@ class Purchaseorder extends MY_Controller {
 			);
 			$stocks = $this->MY_Model->update('tbl_stocks', $stock_data, $stock_where);
 			$data_inv = array(
+				"reference_id" => $po_info['poid'],
 				"item_id" =>$key['item_id'],
 				"item_qty" =>$key['qty'],
 				"type" =>0,

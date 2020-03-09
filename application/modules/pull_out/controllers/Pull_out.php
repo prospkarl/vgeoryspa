@@ -107,6 +107,7 @@ class Pull_out extends MY_Controller {
 		$select = "
 			pull_out_id,
 			tbl_user_details.fname as created_by,
+			status,
 			date_created
 		";
 
@@ -175,5 +176,44 @@ class Pull_out extends MY_Controller {
 		$data['location'] = $pull_out_info['location'];
 
 		ajax_response('success', 'success', $data);
+	}
+
+	public function revertPullOut($pull_out_id) {
+		$reason = $this->input->post('reason');
+
+		$pull_out_info_op['where'] = array('pull_out_id' => $pull_out_id);
+		$pull_out_info = $this->MY_Model->getRows('tbl_pull_out', $pull_out_info_op, 'row_array');
+		$pulled_out_items = json_decode($pull_out_info['items']);
+		$pulled_out_loc = $pull_out_info['location'];
+
+		foreach ($pulled_out_items as $item) {
+			$get_current_qty_op['where'] = array('product_id' => $item->item_id, 'location' => $pulled_out_loc);
+			$curr_stock_info = $this->MY_Model->getRows('tbl_stocks', $get_current_qty_op, 'row_array');
+
+			// Add the qty of the item being pulled out
+			$set_to_qty = (int)$curr_stock_info['qty'] + (int)$item->qty;
+
+			$set_stock_op_set = array('qty' => $set_to_qty);
+			$set_stock_op_where = array('product_id' => $item->item_id, 'location' => $pulled_out_loc);
+
+			$this->MY_Model->update('tbl_stocks', $set_stock_op_set, $set_stock_op_where);
+		}
+
+		$del_mov_where = array(
+			'movement_type' => 'Pull Out',
+			'reference_id' => $pull_out_id,
+		);
+		$this->MY_Model->delete('tbl_inventory_movement', $del_mov_where);
+
+		$upd_pull_out_set = array(
+			'status' => 0,
+			'remarks' => $reason,
+		);
+		$upd_pull_out_where = array(
+			'pull_out_id' => $pull_out_id
+		);
+		$upd = $this->MY_Model->update('tbl_pull_out', $upd_pull_out_set, $upd_pull_out_where);
+
+		ajax_response('Successfully Updated', 'success');
 	}
 }

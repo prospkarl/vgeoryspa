@@ -7,6 +7,7 @@
                         <th>Pull Out ID</th>
                         <th>Created By</th>
                         <th>Date Created</th>
+                        <th>Status</th>
                         <th width="10%">Action</th>
                     </tr>
                 </thead>

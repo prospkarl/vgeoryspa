@@ -117,9 +117,17 @@ function initDatatable(){
             {"data":"pull_out_id"},
             {"data":"created_by"},
             {"data":"date_created"},
+            {"data":"status", "render":function(data){
+                return getStatus(data);
+            }},
             {"data":"action", "render":function(data, type, row){
-                var html = '<a class="btn btn-sm btn-rounded btn-outline-success" href="javascript:;" data-toggle="modal" data-target="#viewModal" onclick="handleClickView('+row.pull_out_id+');"><i class="fa fa-eye"></i> View</a> ';
+                // var html = '<a class="btn btn-sm btn-rounded btn-outline-success" href="javascript:;" data-toggle="modal" data-target="#viewModal" onclick="handleClickView('+row.pull_out_id+');"><i class="fa fa-eye"></i> View</a> ';
+                var html = `<a href="javascript:;" data-toggle="modal" data-target="#viewModal" onclick="handleClickView(`+row.pull_out_id+`);"><i class="fas fa-eye" data-toggle="tooltip" title="" data-original-title="View"></i> </a> `;
 
+                if (row.status == 1) {
+                    html += `<a href="javascript:;" onclick="handleRevert(`+row.pull_out_id+`);"><i class="fas fa-window-close" data-toggle="tooltip" title="" data-original-title="Revert"></i></a>`
+                }
+                
                 return html
             }},
         ],
@@ -128,9 +136,12 @@ function initDatatable(){
             "type"  : "POST",
         },
         "columnDefs": [ {
-            "targets"   : [3],
+            "targets"   : [3, 4],
             "orderable" : false,
         }, ],
+        "initComplete" : function(){
+            $('[data-toggle="tooltip"]').tooltip()
+        }
     });
 }
 
@@ -170,19 +181,73 @@ function getStatus(status){
 
     switch (status) {
         case '0':
-            display = '<span class="label label-inverse label-rounded">Pending</span>';
-            break;
-        case '1':
-            display = '<span class="label label-info label-rounded">For Delivery</span>';
-            break;
-        case '2':
-            display = '<span class="label label-success label-rounded">Received</span>';
-            break;
-        case '3':
             display = '<span class="label label-danger label-rounded">Cancelled</span>';
             break;
-
+        case '1':
+            display = '<span class="label label-info label-rounded">Completed</span>';
+            break;
     }
 
     return display;
+}
+
+function handleRevert(pull_out_id) {
+    Swal.mixin({
+        confirmButtonText: 'Next &rarr;',
+        showCancelButton: true,
+        progressSteps: ['1', '2']
+    }).queue([
+        {
+            title: 'Warning!',
+            text: "Are you sure to delete this pull out? All inventory movement will be reverted.",
+            confirmButtonColor: "#A4A23C",
+            confirmButtonText: "I understand",
+            cancelButtonColor: 'indianred',
+            cancelButtonText: 'Cancel',
+        },
+        {
+            title: 'Input your reason',
+            input: "textarea",
+            preConfirm: (res) => {
+                let proceed = true;
+
+                const msg ={
+                    message: 'Please tell us the reason',
+                    type: 'warning'
+                }
+
+                if (res == '') {
+                    proceed = false;
+                    showNotification(msg);
+                }
+
+                return proceed;
+            },
+            confirmButtonColor: "#A4A23C",
+            confirmButtonText: "Submit",
+        },
+    ]).then((result) => {
+        if (result.value) {
+            revertAjax(pull_out_id);
+        }
+    })
+}
+
+function revertAjax(pull_out_id) {
+    const reason = $('.swal2-textarea').val();
+    console.log();
+    $.ajax({
+        url: BASE_URL + 'pull_out/revertpullout/' + pull_out_id,
+        type: 'POST',
+        data: {
+            reason: reason
+        },
+        dataType: 'json',
+        success: function(res){
+            if (res.type == 'success') {
+                initDatatable();
+            }
+            showNotification(res);
+        }
+    })
 }
